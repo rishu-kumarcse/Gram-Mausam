@@ -51,6 +51,7 @@
         <div class="control-group block-select-group">
           <label class="ctrl-label">Administrative Block:</label>
           <select id="officer-block-select" class="ctrl-select"></select>
+          <span id="officer-weather-source-badge" class="badge-tag" style="background:#2e7d32; display:none;">🟢 Live NWP Feed</span>
         </div>
 
         <div class="control-group synoptic-inputs-group">
@@ -79,6 +80,9 @@
             <input type="number" id="input-rh" value="88.0" step="1.0">
           </div>
 
+          <button class="btn btn-outline" id="btn-fetch-live-weather" onclick="fetchLiveWeatherForCurrentBlock()" title="Fetch live ECMWF forecast for this block" style="font-size:0.85rem;">
+            <span>🔄</span> Live Weather
+          </button>
           <button class="btn btn-primary downscale-action-btn" onclick="runBlockDownscaling()">
             <span>⚡</span> Downscale to GPs
           </button>

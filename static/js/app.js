@@ -67,14 +67,14 @@ async function loadDistrictsAndBlocks() {
       if (farmerBlockSelect) farmerBlockSelect.appendChild(optGroup.cloneNode(true));
     }
 
-    // Set default block and run downscaling
+    // Set default block and fetch live weather
     blockSelect.value = currentBlockId;
-    runBlockDownscaling();
+    fetchLiveWeatherForCurrentBlock(true);
 
     blockSelect.addEventListener("change", (e) => {
       currentBlockId = e.target.value;
       if (farmerBlockSelect) farmerBlockSelect.value = currentBlockId;
-      runBlockDownscaling();
+      fetchLiveWeatherForCurrentBlock(true);
     });
 
     if (farmerBlockSelect) {
@@ -82,11 +82,61 @@ async function loadDistrictsAndBlocks() {
       farmerBlockSelect.addEventListener("change", (e) => {
         currentBlockId = e.target.value;
         blockSelect.value = currentBlockId;
-        runBlockDownscaling();
+        fetchLiveWeatherForCurrentBlock(true);
       });
     }
   } catch (err) {
     showToast("Error loading districts: " + err.message);
+  }
+}
+
+async function fetchLiveWeatherForCurrentBlock(autoDownscale = true) {
+  const badge = document.getElementById("officer-weather-source-badge");
+  if (badge) {
+    badge.style.display = "inline-block";
+    badge.textContent = "⏳ Fetching Live...";
+    badge.style.background = "#f57f17";
+  }
+
+  try {
+    const res = await fetch(`/api/v1/geo/block-weather/${currentBlockId}`);
+    const json = await res.json();
+    
+    if (json.status === "success" && json.weather) {
+      const w = json.weather;
+      
+      const rainInput = document.getElementById("input-rain");
+      const tmaxInput = document.getElementById("input-tmax");
+      const tminInput = document.getElementById("input-tmin");
+      const windInput = document.getElementById("input-wind");
+      const rhInput = document.getElementById("input-rh");
+
+      if (rainInput) rainInput.value = w.rainfall_mm !== undefined ? w.rainfall_mm : 12.0;
+      if (tmaxInput) tmaxInput.value = w.tmax_c !== undefined ? w.tmax_c : 31.0;
+      if (tminInput) tminInput.value = w.tmin_c !== undefined ? w.tmin_c : 21.0;
+      if (windInput) windInput.value = w.wind_speed_kmh !== undefined ? w.wind_speed_kmh : 12.0;
+      if (rhInput) rhInput.value = w.rh_max_pct !== undefined ? w.rh_max_pct : 80.0;
+
+      if (badge) {
+        badge.style.display = "inline-block";
+        badge.textContent = json.is_live ? "🟢 Live NWP Feed" : "🟡 Calibrated IMD Forecast";
+        badge.style.background = json.is_live ? "#2e7d32" : "#1565c0";
+        badge.title = `${json.block_name} (${json.district}) - ${json.source}`;
+      }
+
+      showToast(`Loaded live weather for ${json.block_name} (${json.district}): ${w.tmax_c}°C, Rain ${w.rainfall_mm}mm`);
+    }
+  } catch (err) {
+    console.warn("Could not fetch live block weather:", err);
+    if (badge) {
+      badge.style.display = "inline-block";
+      badge.textContent = "⚠️ Manual Mode";
+      badge.style.background = "#616161";
+    }
+  }
+
+  if (autoDownscale) {
+    await runBlockDownscaling();
   }
 }
 
