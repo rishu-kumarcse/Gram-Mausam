@@ -48,28 +48,38 @@
     <section id="officer-view" class="view-panel active">
       <!-- Synoptic Inputs & Geographic Selector -->
       <div class="control-strip">
-        <div class="control-group">
+        <div class="control-group block-select-group">
           <label class="ctrl-label">Administrative Block:</label>
-          <select id="officer-block-select" style="min-width: 200px; font-weight: 600;"></select>
+          <select id="officer-block-select" class="ctrl-select"></select>
         </div>
 
-        <div class="control-group">
-          <label class="ctrl-label">Rain (mm):</label>
-          <input type="number" id="input-rain" value="14.5" step="0.5" style="width: 75px;">
+        <div class="control-group synoptic-inputs-group">
+          <div class="synoptic-input-item">
+            <label class="ctrl-label">Rain (mm):</label>
+            <input type="number" id="input-rain" value="14.5" step="0.5">
+          </div>
 
-          <label class="ctrl-label">Tmax (°C):</label>
-          <input type="number" id="input-tmax" value="31.4" step="0.5" style="width: 70px;">
+          <div class="synoptic-input-item">
+            <label class="ctrl-label">Tmax (°C):</label>
+            <input type="number" id="input-tmax" value="31.4" step="0.5">
+          </div>
 
-          <label class="ctrl-label">Tmin (°C):</label>
-          <input type="number" id="input-tmin" value="21.2" step="0.5" style="width: 70px;">
+          <div class="synoptic-input-item">
+            <label class="ctrl-label">Tmin (°C):</label>
+            <input type="number" id="input-tmin" value="21.2" step="0.5">
+          </div>
 
-          <label class="ctrl-label">Wind (km/h):</label>
-          <input type="number" id="input-wind" value="14.5" step="0.5" style="width: 70px;">
+          <div class="synoptic-input-item">
+            <label class="ctrl-label">Wind (km/h):</label>
+            <input type="number" id="input-wind" value="14.5" step="0.5">
+          </div>
 
-          <label class="ctrl-label">RH (%):</label>
-          <input type="number" id="input-rh" value="88.0" step="1.0" style="width: 70px;">
+          <div class="synoptic-input-item">
+            <label class="ctrl-label">RH (%):</label>
+            <input type="number" id="input-rh" value="88.0" step="1.0">
+          </div>
 
-          <button class="btn btn-primary" onclick="runBlockDownscaling()">
+          <button class="btn btn-primary downscale-action-btn" onclick="runBlockDownscaling()">
             <span>⚡</span> Downscale to GPs
           </button>
         </div>
@@ -79,12 +89,12 @@
       <div class="dashboard-grid">
         <!-- Map Card -->
         <div class="card">
-          <div class="card-header">
+          <div class="card-header responsive-card-header">
             <div class="card-title">
               <span>🗺️</span> Gram Panchayat Micro-Climate Choropleth
               <span id="officer-gp-count" class="badge-tag" style="background:#1565c0;">0</span>
             </div>
-            <div style="display:flex; align-items:center; gap:8px;">
+            <div class="map-metric-selector">
               <label class="ctrl-label">Map Metric:</label>
               <select id="officer-map-metric" onchange="renderPanchayatsOnMap(currentPanchayats, this.value)">
                 <option value="rainfall_mm">Rainfall (mm)</option>
@@ -97,7 +107,7 @@
           </div>
           <!-- Leaflet Map Div -->
           <div id="map"></div>
-          <div style="padding: 10px 16px; background:#fafafa; font-size:0.78rem; color:#616161; display:flex; justify-content:space-between;">
+          <div class="map-footer-bar">
             <span>ℹ️ Click any Gram Panchayat polygon on the map to inspect its hyperlocal agro-met advisory.</span>
             <span>Law of Conservation Enforced: <strong style="color:#2e7d32;">Area-Weighted Mean == Block Forecast</strong></span>
           </div>
@@ -114,7 +124,7 @@
           
           <div class="card-body">
             <!-- Micro-Topography Pills -->
-            <div style="display:flex; gap:12px; margin-bottom:14px; font-size:0.84rem; color:#424242;">
+            <div class="micro-topo-pills">
               <div>Elev: <strong id="detail-elev">--</strong></div>
               <div>Area: <strong id="detail-area">--</strong></div>
               <div>Terrain Δz: <strong id="detail-delta-elev">--</strong></div>
@@ -147,8 +157,8 @@
             </div>
 
             <!-- Crop & Stage Controls -->
-            <div style="display:flex; gap:10px; margin-bottom:14px;">
-              <select id="crop-select" onchange="generateCurrentAdvisory()" style="flex:1;">
+            <div class="crop-stage-row">
+              <select id="crop-select" onchange="generateCurrentAdvisory()">
                 <option value="wheat">Wheat (गेहूं)</option>
                 <option value="rice">Paddy / Rice (धान)</option>
                 <option value="cotton">Cotton (कपास)</option>
@@ -161,7 +171,7 @@
                 <option value="chickpea">Chickpea / Gram (चना)</option>
               </select>
 
-              <select id="stage-select" onchange="generateCurrentAdvisory()" style="flex:1;">
+              <select id="stage-select" onchange="generateCurrentAdvisory()">
                 <option value="crown_root">Crown Root Initiation (CRI)</option>
                 <option value="tillering">Tillering / Vegetative</option>
                 <option value="flowering_boll_setting">Flowering & Bloom</option>
@@ -216,15 +226,15 @@
                 Ask real-time agro-met questions grounded in this village's downscaled data:
               </div>
               
-              <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
-                <button class="btn btn-outline" style="font-size:0.75rem; padding:3px 8px;" onclick="askQuickPrompt('Can I spray chemical pesticide tomorrow morning given this wind and rain forecast?')">Spray Safety?</button>
-                <button class="btn btn-outline" style="font-size:0.75rem; padding:3px 8px;" onclick="askQuickPrompt('Explain why this village has different rainfall than the block average.')">Rain Shadow?</button>
-                <button class="btn btn-outline" style="font-size:0.75rem; padding:3px 8px;" onclick="askQuickPrompt('What are organic alternatives for active disease risks in this crop?')">Organic Controls?</button>
+              <div class="quick-prompts-group">
+                <button class="btn btn-outline quick-prompt-chip" onclick="askQuickPrompt('Can I spray chemical pesticide tomorrow morning given this wind and rain forecast?')">Spray Safety?</button>
+                <button class="btn btn-outline quick-prompt-chip" onclick="askQuickPrompt('Explain why this village has different rainfall than the block average.')">Rain Shadow?</button>
+                <button class="btn btn-outline quick-prompt-chip" onclick="askQuickPrompt('What are organic alternatives for active disease risks in this crop?')">Organic Controls?</button>
               </div>
 
-              <div style="display:flex; gap:6px;">
-                <input type="text" id="ai-query-input" placeholder="Type your query (Marathi, Hindi, English)..." style="flex:1; font-size:0.85rem; padding:6px 10px;">
-                <button class="btn btn-primary" id="ask-ai-btn" onclick="submitAIQuery()" style="padding:6px 14px; font-size:0.85rem;">
+              <div class="ai-query-row">
+                <input type="text" id="ai-query-input" placeholder="Type your query (Marathi, Hindi, English)...">
+                <button class="btn btn-primary" id="ask-ai-btn" onclick="submitAIQuery()">
                   <span>Ask AI</span>
                 </button>
               </div>
@@ -279,8 +289,8 @@
 
     <!-- VIEW 2: FARMER HYPERLOCAL PORTAL -->
     <section id="farmer-view" class="view-panel">
-      <div class="control-strip">
-        <div class="control-group">
+      <div class="control-strip farmer-control-strip">
+        <div class="farmer-ctrl-item">
           <label class="ctrl-label">Language / भाषा / ಭಾಷೆ:</label>
           <select id="farmer-language-select" style="font-weight:700; color:var(--primary);">
             <option value="mr">मराठी (Marathi)</option>
@@ -290,26 +300,30 @@
             <option value="ta">தமிழ் (Tamil)</option>
             <option value="en">English</option>
           </select>
+        </div>
 
-          <label class="ctrl-label" style="margin-left:10px;">तालुका (Block):</label>
+        <div class="farmer-ctrl-item">
+          <label class="ctrl-label">तालुका (Block):</label>
           <select id="farmer-block-select" style="font-weight:600;"></select>
+        </div>
 
-          <label class="ctrl-label" style="margin-left:10px;">ग्रामपंचायत (Village):</label>
-          <select id="farmer-gp-select" style="font-weight:600; min-width:180px;"></select>
+        <div class="farmer-ctrl-item">
+          <label class="ctrl-label">ग्रामपंचायत (Village):</label>
+          <select id="farmer-gp-select" style="font-weight:600;"></select>
         </div>
       </div>
 
       <div style="max-width:850px; margin: 0 auto;">
         <!-- Audio Readout Card (Voice Synthesizer for Illiterate Farmers) -->
         <div class="audio-player-card">
-          <div style="display:flex; align-items:center; gap:16px;">
+          <div class="audio-header-group">
             <button class="play-circle-btn" id="play-voice-btn">🔊</button>
-            <div>
-              <div style="font-size:1.1rem; font-weight:700;">हवामान सल्ला ऐका (Listen to Weather Advisory)</div>
-              <div style="font-size:0.85rem; opacity:0.9;">Touch to listen in your local dialect (Marathi / Hindi / Kannada)</div>
+            <div class="audio-title-group">
+              <div class="audio-main-title">हवामान सल्ला ऐका (Listen to Weather Advisory)</div>
+              <div class="audio-sub-title">Touch to listen in your local dialect (Marathi / Hindi / Kannada)</div>
             </div>
           </div>
-          <span class="badge-tag" style="background:rgba(255,255,255,0.25); color:white;">Text-to-Speech</span>
+          <span class="badge-tag audio-badge" style="background:rgba(255,255,255,0.25); color:white;">Text-to-Speech</span>
         </div>
 
         <!-- Voice Transcript Text Display -->
@@ -321,7 +335,7 @@
         </div>
 
         <!-- Action Grid for Farmers -->
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:20px;">
+        <div class="farmer-action-grid">
           <!-- Spraying Card -->
           <div class="card" style="padding:18px; border-top: 4px solid #2e7d32;">
             <div style="font-size:1.05rem; font-weight:700; margin-bottom:8px;">🚿 आज फवारणी करावी का? (Can I Spray?)</div>
@@ -358,8 +372,8 @@
             <button class="btn btn-outline" style="font-size:0.8rem;" onclick="askQuickFarmerPrompt('रोग नियंत्रणासाठी जैविक उपाय काय आहेत?')">🌿 जैविक उपाय?</button>
           </div>
 
-          <div style="display:flex; gap:8px;">
-            <input type="text" id="farmer-ai-input" placeholder="तुमचा प्रश्न येथे विचारा (उदा: फवारणी कधी करावी?)..." style="flex:1; font-size:0.95rem; padding:10px 14px;">
+          <div class="farmer-ai-input-row">
+            <input type="text" id="farmer-ai-input" placeholder="तुमचा प्रश्न येथे विचारा (उदा: फवारणी कधी करावी?)...">
             <button class="btn btn-primary" onclick="submitFarmerAIQuery()" style="background:#7b1fa2;">
               <span>विचार करा</span>
             </button>
@@ -473,7 +487,7 @@
             Connect live numerical weather prediction forecasts via Open-Meteo / ECMWF IFS / IMD GKMS feeds to simulate operational panchayat downscaling.
           </p>
 
-          <div style="display:flex; gap:12px; margin-bottom:16px;">
+          <div class="nwp-buttons-row">
             <button class="btn btn-primary" onclick="fetchLiveForecast()">
               <span>🌐</span> Fetch Live ECMWF for Maharashtra
             </button>
