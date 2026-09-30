@@ -15,16 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
   loadDistrictsAndBlocks();
   initFarmerControls();
   initBenchmarkControls();
-
-  // Invalidate map size on mobile orientation change or window resize
-  window.addEventListener("resize", () => {
-    if (mapInstance) mapInstance.invalidateSize();
-  });
-  window.addEventListener("orientationchange", () => {
-    setTimeout(() => {
-      if (mapInstance) mapInstance.invalidateSize();
-    }, 250);
-  });
 });
 
 // Navigation Tabs
