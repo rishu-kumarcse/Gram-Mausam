@@ -1,3 +1,13 @@
+---
+title: GramSahayak
+emoji: 🌾
+colorFrom: green
+colorTo: blue
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # 🌾 GRAMMAUSAM — Panchayat-Level Weather Downscaling & Agro-Meteorological Advisory System
 
 > **SIH Problem Statement 26074 | Smart India Hackathon**
