@@ -1,0 +1,525 @@
+{
+  "rice": {
+    "name": "Paddy / Rice",
+    "season": "Kharif / Rabi",
+    "base_temp_c": 10.0,
+    "stages": {
+      "nursery": {
+        "duration_days": 25,
+        "kc": 1.15,
+        "critical_water": true,
+        "desc": "Nursery raising and seedling establishment"
+      },
+      "transplanting": {
+        "duration_days": 15,
+        "kc": 1.1,
+        "critical_water": true,
+        "desc": "Transplanting into puddled field"
+      },
+      "tillering": {
+        "duration_days": 30,
+        "kc": 1.15,
+        "critical_water": true,
+        "desc": "Active tillering and canopy development"
+      },
+      "panicle_initiation": {
+        "duration_days": 20,
+        "kc": 1.25,
+        "critical_water": true,
+        "desc": "Panicle initiation and flowering"
+      },
+      "grain_filling": {
+        "duration_days": 25,
+        "kc": 1.1,
+        "critical_water": true,
+        "desc": "Milk and dough stage of grains"
+      },
+      "maturity_harvest": {
+        "duration_days": 15,
+        "kc": 0.9,
+        "critical_water": false,
+        "desc": "Ripening and field drying for harvest"
+      }
+    },
+    "temp_optimal": [
+      22,
+      32
+    ],
+    "temp_critical_high": 38.0,
+    "water_sensitive_stages": [
+      "panicle_initiation",
+      "flowering",
+      "tillering"
+    ],
+    "pests_diseases": [
+      "blast",
+      "bacterial_leaf_blight",
+      "stem_borer",
+      "brown_planthopper"
+    ]
+  },
+  "wheat": {
+    "name": "Wheat",
+    "season": "Rabi",
+    "base_temp_c": 5.0,
+    "stages": {
+      "crown_root": {
+        "duration_days": 22,
+        "kc": 0.4,
+        "critical_water": true,
+        "desc": "Crown root initiation (CRI) stage - most critical for irrigation"
+      },
+      "tillering": {
+        "duration_days": 25,
+        "kc": 0.75,
+        "critical_water": false,
+        "desc": "Tillering stage"
+      },
+      "jointing": {
+        "duration_days": 20,
+        "kc": 1.05,
+        "critical_water": true,
+        "desc": "Stem elongation / jointing stage"
+      },
+      "heading_flowering": {
+        "duration_days": 18,
+        "kc": 1.15,
+        "critical_water": true,
+        "desc": "Heading and anthesis"
+      },
+      "milking_dough": {
+        "duration_days": 25,
+        "kc": 0.85,
+        "critical_water": true,
+        "desc": "Grain filling / milking and dough"
+      },
+      "maturity_harvest": {
+        "duration_days": 15,
+        "kc": 0.4,
+        "critical_water": false,
+        "desc": "Physiological maturity and drying"
+      }
+    },
+    "temp_optimal": [
+      15,
+      25
+    ],
+    "temp_critical_high": 30.0,
+    "water_sensitive_stages": [
+      "crown_root",
+      "heading_flowering",
+      "milking_dough"
+    ],
+    "pests_diseases": [
+      "yellow_rust",
+      "loose_smut",
+      "aphids",
+      "terminal_heat_stress"
+    ]
+  },
+  "cotton": {
+    "name": "Cotton",
+    "season": "Kharif",
+    "base_temp_c": 15.0,
+    "stages": {
+      "seedling": {
+        "duration_days": 25,
+        "kc": 0.45,
+        "critical_water": false,
+        "desc": "Germination and early vegetative"
+      },
+      "square_formation": {
+        "duration_days": 35,
+        "kc": 0.75,
+        "critical_water": true,
+        "desc": "Squaring / bud formation"
+      },
+      "flowering_boll_setting": {
+        "duration_days": 45,
+        "kc": 1.15,
+        "critical_water": true,
+        "desc": "Flowering and peak boll development"
+      },
+      "boll_opening": {
+        "duration_days": 30,
+        "kc": 0.8,
+        "critical_water": false,
+        "desc": "Boll maturation and opening"
+      },
+      "harvest_picking": {
+        "duration_days": 25,
+        "kc": 0.5,
+        "critical_water": false,
+        "desc": "Bursting and multiple pickings"
+      }
+    },
+    "temp_optimal": [
+      21,
+      35
+    ],
+    "temp_critical_high": 40.0,
+    "water_sensitive_stages": [
+      "flowering_boll_setting",
+      "square_formation"
+    ],
+    "pests_diseases": [
+      "pink_bollworm",
+      "whitefly",
+      "jassids",
+      "grey_mildew"
+    ]
+  },
+  "soybean": {
+    "name": "Soybean",
+    "season": "Kharif",
+    "base_temp_c": 10.0,
+    "stages": {
+      "germination": {
+        "duration_days": 15,
+        "kc": 0.4,
+        "critical_water": false,
+        "desc": "Emergence and seedling"
+      },
+      "vegetative": {
+        "duration_days": 25,
+        "kc": 0.7,
+        "critical_water": false,
+        "desc": "Canopy branching and node formation"
+      },
+      "flowering": {
+        "duration_days": 20,
+        "kc": 1.15,
+        "critical_water": true,
+        "desc": "R1-R2 flower bloom - highly sensitive to moisture stress"
+      },
+      "pod_formation": {
+        "duration_days": 25,
+        "kc": 1.1,
+        "critical_water": true,
+        "desc": "R3-R4 pod setting and seed expansion"
+      },
+      "maturity_harvest": {
+        "duration_days": 15,
+        "kc": 0.5,
+        "critical_water": false,
+        "desc": "Defoliation and pod drying"
+      }
+    },
+    "temp_optimal": [
+      20,
+      30
+    ],
+    "temp_critical_high": 35.0,
+    "water_sensitive_stages": [
+      "flowering",
+      "pod_formation"
+    ],
+    "pests_diseases": [
+      "girdle_beetle",
+      "semilooper",
+      "anthracnose",
+      "yellow_mosaic"
+    ]
+  },
+  "onion": {
+    "name": "Onion",
+    "season": "Kharif / Late Kharif / Rabi",
+    "base_temp_c": 7.0,
+    "stages": {
+      "nursery_transplanting": {
+        "duration_days": 30,
+        "kc": 0.5,
+        "critical_water": true,
+        "desc": "Nursery raising and transplanting"
+      },
+      "vegetative": {
+        "duration_days": 35,
+        "kc": 0.75,
+        "critical_water": false,
+        "desc": "Foliage development and collar growth"
+      },
+      "bulb_initiation": {
+        "duration_days": 25,
+        "kc": 1.05,
+        "critical_water": true,
+        "desc": "Bulb swelling and neck formation"
+      },
+      "bulb_development": {
+        "duration_days": 30,
+        "kc": 1.0,
+        "critical_water": true,
+        "desc": "Bulb sizing and scale enlargement"
+      },
+      "maturity_curing": {
+        "duration_days": 15,
+        "kc": 0.6,
+        "critical_water": false,
+        "desc": "Neck fall, stopping irrigation for curing"
+      }
+    },
+    "temp_optimal": [
+      13,
+      28
+    ],
+    "temp_critical_high": 35.0,
+    "water_sensitive_stages": [
+      "bulb_initiation",
+      "bulb_development"
+    ],
+    "pests_diseases": [
+      "thrips",
+      "purple_blotch",
+      "stem_rot",
+      "downy_mildew"
+    ]
+  },
+  "grapes": {
+    "name": "Grapes (Viticulture)",
+    "season": "Perennial (October Pruning Cycle)",
+    "base_temp_c": 10.0,
+    "stages": {
+      "post_pruning_sprouting": {
+        "duration_days": 20,
+        "kc": 0.35,
+        "critical_water": true,
+        "desc": "Bud break and cane sprouting"
+      },
+      "flowering_veraison": {
+        "duration_days": 35,
+        "kc": 0.7,
+        "critical_water": true,
+        "desc": "Inflorescence, fruit set and veraison"
+      },
+      "berry_development": {
+        "duration_days": 40,
+        "kc": 0.85,
+        "critical_water": true,
+        "desc": "Berry sizing and sugar accumulation"
+      },
+      "harvest_preparation": {
+        "duration_days": 25,
+        "kc": 0.65,
+        "critical_water": false,
+        "desc": "Ripening and TSS stabilization"
+      }
+    },
+    "temp_optimal": [
+      18,
+      32
+    ],
+    "temp_critical_high": 38.0,
+    "water_sensitive_stages": [
+      "flowering_veraison",
+      "berry_development"
+    ],
+    "pests_diseases": [
+      "downy_mildew",
+      "powdery_mildew",
+      "anthracnose",
+      "thrips",
+      "flea_beetle"
+    ]
+  },
+  "sugarcane": {
+    "name": "Sugarcane",
+    "season": "Adsali / Pre-seasonal / Suru",
+    "base_temp_c": 12.0,
+    "stages": {
+      "germination": {
+        "duration_days": 40,
+        "kc": 0.45,
+        "critical_water": true,
+        "desc": "Sett sprout and primary root establishment"
+      },
+      "tillering": {
+        "duration_days": 70,
+        "kc": 0.85,
+        "critical_water": true,
+        "desc": "Tiller emergence and formulative phase"
+      },
+      "grand_growth": {
+        "duration_days": 120,
+        "kc": 1.25,
+        "critical_water": true,
+        "desc": "Cane elongation and internode expansion"
+      },
+      "ripening_harvest": {
+        "duration_days": 60,
+        "kc": 0.75,
+        "critical_water": false,
+        "desc": "Sucrose accumulation and desiccation"
+      }
+    },
+    "temp_optimal": [
+      24,
+      35
+    ],
+    "temp_critical_high": 42.0,
+    "water_sensitive_stages": [
+      "formulative",
+      "grand_growth"
+    ],
+    "pests_diseases": [
+      "early_shoot_borer",
+      "internode_borer",
+      "red_rot",
+      "woolly_aphid",
+      "lodging_wind"
+    ]
+  },
+  "maize": {
+    "name": "Maize / Corn",
+    "season": "Kharif / Rabi",
+    "base_temp_c": 10.0,
+    "stages": {
+      "seedling": {
+        "duration_days": 20,
+        "kc": 0.4,
+        "critical_water": false,
+        "desc": "V1 to V6 leaf collar emergence"
+      },
+      "knee_high": {
+        "duration_days": 25,
+        "kc": 0.8,
+        "critical_water": true,
+        "desc": "Rapid stem elongation"
+      },
+      "tasseling_silking": {
+        "duration_days": 20,
+        "kc": 1.2,
+        "critical_water": true,
+        "desc": "Pollen shed and ear silking (vital water stage)"
+      },
+      "grain_filling": {
+        "duration_days": 30,
+        "kc": 1.05,
+        "critical_water": true,
+        "desc": "Blister, milk, and dent stage of kernels"
+      },
+      "maturity_harvest": {
+        "duration_days": 15,
+        "kc": 0.6,
+        "critical_water": false,
+        "desc": "Black layer formation and ear drying"
+      }
+    },
+    "temp_optimal": [
+      18,
+      30
+    ],
+    "temp_critical_high": 35.0,
+    "water_sensitive_stages": [
+      "tasseling_silking",
+      "grain_filling"
+    ],
+    "pests_diseases": [
+      "fall_armyworm",
+      "stem_borer",
+      "maydis_leaf_blight",
+      "turcicum_leaf_blight"
+    ]
+  },
+  "tomato": {
+    "name": "Tomato",
+    "season": "Kharif / Rabi / Summer",
+    "base_temp_c": 10.0,
+    "stages": {
+      "nursery_transplanting": {
+        "duration_days": 25,
+        "kc": 0.45,
+        "critical_water": true,
+        "desc": "Nursery and hardening"
+      },
+      "vegetative": {
+        "duration_days": 25,
+        "kc": 0.75,
+        "critical_water": false,
+        "desc": "Branching and foliage formation"
+      },
+      "flowering_fruit_set": {
+        "duration_days": 30,
+        "kc": 1.15,
+        "critical_water": true,
+        "desc": "Flower bloom and fruit set"
+      },
+      "fruit_development": {
+        "duration_days": 35,
+        "kc": 1.05,
+        "critical_water": true,
+        "desc": "Fruit sizing and breaker stage"
+      },
+      "harvest_pickings": {
+        "duration_days": 30,
+        "kc": 0.8,
+        "critical_water": false,
+        "desc": "Multiple pickings of red ripe fruit"
+      }
+    },
+    "temp_optimal": [
+      18,
+      28
+    ],
+    "temp_critical_high": 35.0,
+    "water_sensitive_stages": [
+      "flowering_fruit_set",
+      "fruit_development"
+    ],
+    "pests_diseases": [
+      "late_blight",
+      "early_blight",
+      "leaf_curl_virus",
+      "fruit_borer"
+    ]
+  },
+  "chickpea": {
+    "name": "Gram / Chickpea",
+    "season": "Rabi",
+    "base_temp_c": 5.0,
+    "stages": {
+      "seedling": {
+        "duration_days": 20,
+        "kc": 0.4,
+        "critical_water": false,
+        "desc": "Germination and branch initiation"
+      },
+      "vegetative": {
+        "duration_days": 30,
+        "kc": 0.7,
+        "critical_water": false,
+        "desc": "Canopy expansion"
+      },
+      "flowering": {
+        "duration_days": 25,
+        "kc": 1.0,
+        "critical_water": true,
+        "desc": "Anthesis - avoid heavy irrigation"
+      },
+      "pod_formation": {
+        "duration_days": 25,
+        "kc": 0.9,
+        "critical_water": true,
+        "desc": "Pod development"
+      },
+      "maturity_harvest": {
+        "duration_days": 15,
+        "kc": 0.35,
+        "critical_water": false,
+        "desc": "Foliage senescence and pod drying"
+      }
+    },
+    "temp_optimal": [
+      15,
+      25
+    ],
+    "temp_critical_high": 30.0,
+    "water_sensitive_stages": [
+      "pod_formation",
+      "branching"
+    ],
+    "pests_diseases": [
+      "helicoverpa_pod_borer",
+      "fusarium_wilt",
+      "aschochyta_blight"
+    ]
+  }
+}

@@ -1,0 +1,134 @@
+{
+  "late_blight": {
+    "name": "Late Blight (Phytophthora infestans)",
+    "target_crops": [
+      "tomato",
+      "potato"
+    ],
+    "conditions": {
+      "temp_min": 10.0,
+      "temp_max": 22.0,
+      "rh_min": 85.0,
+      "min_wet_hours": 10,
+      "rainfall_trigger_mm": 2.0
+    },
+    "severity_thresholds": {
+      "HIGH": "Relative Humidity > 90% and Temp between 12-21\u00b0C with continuous cloudiness/rain",
+      "MODERATE": "Relative Humidity 80-90% and Temp between 10-24\u00b0C",
+      "LOW": "Relative Humidity < 80% or Temp > 25\u00b0C"
+    },
+    "recommendation": "High late blight risk detected. Spray Mancozeb 75 WP @ 2.5 g/L or Cymoxanil + Mancozeb @ 2 g/L during clear weather window. Ensure proper field drainage.",
+    "organic_measure": "Apply Trichoderma viride @ 5g/L or copper oxychloride preventive spray."
+  },
+  "downy_mildew": {
+    "name": "Downy Mildew (Plasmopara viticola)",
+    "target_crops": [
+      "grapes",
+      "onion"
+    ],
+    "conditions": {
+      "temp_min": 15.0,
+      "temp_max": 26.0,
+      "rh_min": 80.0,
+      "rainfall_trigger_mm": 1.0
+    },
+    "severity_thresholds": {
+      "HIGH": "Temp 18-24\u00b0C and RH > 85% with leaf wetness > 6 hours",
+      "MODERATE": "Temp 15-28\u00b0C and RH 75-85%"
+    },
+    "recommendation": "Favorable conditions for Downy Mildew. Apply Potassium phosphonate @ 4 g/L or Dimethomorph @ 1 g/L. Spray only when wind < 12 km/h.",
+    "organic_measure": "Spray Bordeaux mixture 1% as prophylactic measure."
+  },
+  "powdery_mildew": {
+    "name": "Powdery Mildew (Erysiphe / Leveillula)",
+    "target_crops": [
+      "grapes",
+      "chickpea",
+      "tomato"
+    ],
+    "conditions": {
+      "temp_min": 20.0,
+      "temp_max": 32.0,
+      "rh_min": 50.0,
+      "rh_max": 75.0,
+      "dry_weather_favored": true
+    },
+    "severity_thresholds": {
+      "HIGH": "Warm dry days (25-30\u00b0C) followed by humid mornings (60-70% RH)",
+      "MODERATE": "Temp 20-32\u00b0C and RH 50-60%"
+    },
+    "recommendation": "Apply Wettable Sulphur 80 WDG @ 2-3 g/L or Hexaconazole 5 EC @ 1 ml/L during morning hours.",
+    "organic_measure": "Foliar spray of 10% cow milk or neem seed kernel extract (NSKE 5%)."
+  },
+  "blast": {
+    "name": "Rice Blast (Magnaporthe oryzae)",
+    "target_crops": [
+      "rice"
+    ],
+    "conditions": {
+      "temp_night_min": 20.0,
+      "temp_night_max": 26.0,
+      "rh_min": 85.0,
+      "overcast_sky": true
+    },
+    "severity_thresholds": {
+      "HIGH": "Night temperature 20-25\u00b0C with RH > 90% and morning dew",
+      "MODERATE": "RH 80-88% with cool nights"
+    },
+    "recommendation": "High blast risk for paddy. Apply Tricyclazole 75 WP @ 0.6 g/L or Isoprothiolane 40 EC @ 1.5 ml/L. Avoid excess nitrogen top-dressing.",
+    "organic_measure": "Spray Pseudomonas fluorescens @ 10g/L or fermented butter-milk solution."
+  },
+  "pink_bollworm": {
+    "name": "Pink Bollworm & Whitefly",
+    "target_crops": [
+      "cotton"
+    ],
+    "conditions": {
+      "temp_min": 25.0,
+      "temp_max": 36.0,
+      "rh_min": 65.0,
+      "dry_warm_spells": true
+    },
+    "severity_thresholds": {
+      "HIGH": "Extended warm spell (30-36\u00b0C) and cloudy intervals triggering moth emergence",
+      "MODERATE": "Temp 26-32\u00b0C with fluctuating humidity"
+    },
+    "recommendation": "Install 5 pheromone traps/acre for monitoring. If ETL (>8 moths/trap/night) crossed, apply Profenofos 50 EC @ 2 ml/L or Emamectin Benzoate 5 SG @ 0.4 g/L.",
+    "organic_measure": "Release Trichogramma egg parasitoids @ 60,000/acre; spray 5% NSKE."
+  },
+  "fall_armyworm": {
+    "name": "Fall Armyworm (Spodoptera frugiperda)",
+    "target_crops": [
+      "maize"
+    ],
+    "conditions": {
+      "temp_min": 22.0,
+      "temp_max": 34.0,
+      "rh_min": 55.0
+    },
+    "severity_thresholds": {
+      "HIGH": "Knee-high to whorl stage with warm temperatures (26-32\u00b0C)",
+      "MODERATE": "Mild infestation during early vegetative stage"
+    },
+    "recommendation": "Scout maize whorls for pin-hole feeding. Apply Chlorantraniliprole 18.5 SC @ 0.4 ml/L or Spinetoram 11.7 SC @ 0.5 ml/L into plant whorls.",
+    "organic_measure": "Apply Bacillus thuringiensis (Bt) @ 2g/L or Beauveria bassiana @ 5g/L."
+  },
+  "thrips_purple_blotch": {
+    "name": "Thrips & Purple Blotch (Alternaria porri)",
+    "target_crops": [
+      "onion"
+    ],
+    "conditions": {
+      "temp_min": 20.0,
+      "temp_max": 32.0,
+      "rh_min": 75.0,
+      "high_humidity_after_rain": true
+    },
+    "severity_thresholds": {
+      "HIGH": "Rain followed by warm sunny days (Temp 24-30\u00b0C, RH > 80%)",
+      "MODERATE": "Dry hot weather favoring thrips multiplication"
+    },
+    "recommendation": "Purple blotch risk elevated. Spray Tebuconazole 25.9 EC @ 1 ml/L + Fipronil 5 SC @ 1.5 ml/L with spreader sticker.",
+    "organic_measure": "Install blue sticky traps (20/acre) and spray Lecanicillium lecanii @ 5g/L."
+  }
+}

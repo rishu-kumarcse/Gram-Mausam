@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GramMausam  | Hyperlocal Weather Downscaling & Agro-Met Advisories</title>
+  
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- App Styles -->
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+  <!-- Top Government / IMD Header Bar -->
+  <header class="header-bar">
+    <div class="brand-section">
+      <!-- <div class="brand-emblem"></div> -->
+      <div class="brand-title">
+        <h1>GramMausam </h1>
+        <p>Ministry of Earth Sciences (MoES) &bull; India Meteorological Department (IMD)</p>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <button class="nav-btn active" data-target="officer-view">
+        <span>👨‍💼</span> Officer Command Center
+      </button>
+      <button class="nav-btn" data-target="farmer-view">
+        <span>👨‍🌾</span> Farmer Hyperlocal View
+      </button>
+      <button class="nav-btn" data-target="sandbox-view">
+        <span>🔬</span> AI Benchmark & U-Net
+      </button>
+      <button class="nav-btn" data-target="live-view">
+        <span>📡</span> Live NWP Ingestion
+      </button>
+    </nav>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+
+    <!-- VIEW 1: EXTENSION OFFICER COMMAND CENTER -->
+    <section id="officer-view" class="view-panel active">
+      <!-- Synoptic Inputs & Geographic Selector -->
+      <div class="control-strip">
+        <div class="control-group">
+          <label class="ctrl-label">Administrative Block:</label>
+          <select id="officer-block-select" style="min-width: 200px; font-weight: 600;"></select>
+        </div>
+
+        <div class="control-group">
+          <label class="ctrl-label">Rain (mm):</label>
+          <input type="number" id="input-rain" value="14.5" step="0.5" style="width: 75px;">
+
+          <label class="ctrl-label">Tmax (°C):</label>
+          <input type="number" id="input-tmax" value="31.4" step="0.5" style="width: 70px;">
+
+          <label class="ctrl-label">Tmin (°C):</label>
+          <input type="number" id="input-tmin" value="21.2" step="0.5" style="width: 70px;">
+
+          <label class="ctrl-label">Wind (km/h):</label>
+          <input type="number" id="input-wind" value="14.5" step="0.5" style="width: 70px;">
+
+          <label class="ctrl-label">RH (%):</label>
+          <input type="number" id="input-rh" value="88.0" step="1.0" style="width: 70px;">
+
+          <button class="btn btn-primary" onclick="runBlockDownscaling()">
+            <span>⚡</span> Downscale to GPs
+          </button>
+        </div>
+      </div>
+
+      <!-- 2-Column Grid: GIS Choropleth & Panchayat Detail Inspector -->
+      <div class="dashboard-grid">
+        <!-- Map Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>🗺️</span> Gram Panchayat Micro-Climate Choropleth
+              <span id="officer-gp-count" class="badge-tag" style="background:#1565c0;">0</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <label class="ctrl-label">Map Metric:</label>
+              <select id="officer-map-metric" onchange="renderPanchayatsOnMap(currentPanchayats, this.value)">
+                <option value="rainfall_mm">Rainfall (mm)</option>
+                <option value="tmax_c">Max Temp (°C)</option>
+                <option value="tmin_c">Min Temp (°C)</option>
+                <option value="wind_speed_kmh">Wind Speed (km/h)</option>
+                <option value="rh_max_pct">Relative Humidity (%)</option>
+              </select>
+            </div>
+          </div>
+          <!-- Leaflet Map Div -->
+          <div id="map"></div>
+          <div style="padding: 10px 16px; background:#fafafa; font-size:0.78rem; color:#616161; display:flex; justify-content:space-between;">
+            <span>ℹ️ Click any Gram Panchayat polygon on the map to inspect its hyperlocal agro-met advisory.</span>
+            <span>Law of Conservation Enforced: <strong style="color:#2e7d32;">Area-Weighted Mean == Block Forecast</strong></span>
+          </div>
+        </div>
+
+        <!-- Inspector Drawer Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>📍</span> <span id="detail-panchayat-name">Select a Panchayat</span>
+            </div>
+            <span id="pill-support" class="status-pill status-go">HIGH SUPPORT</span>
+          </div>
+          
+          <div class="card-body">
+            <!-- Micro-Topography Pills -->
+            <div style="display:flex; gap:12px; margin-bottom:14px; font-size:0.84rem; color:#424242;">
+              <div>Elev: <strong id="detail-elev">--</strong></div>
+              <div>Area: <strong id="detail-area">--</strong></div>
+              <div>Terrain Δz: <strong id="detail-delta-elev">--</strong></div>
+            </div>
+
+            <!-- Weather Metric Pills -->
+            <div class="metrics-pill-grid">
+              <div class="metric-pill rain">
+                <div class="metric-label">Rainfall</div>
+                <div class="metric-val" id="pill-rain">-- mm</div>
+                <div class="metric-sub" id="pill-rain-prob">--% chance</div>
+                <div class="metric-sub" id="pill-rain-p10" style="font-size:0.7rem; color:#0288d1;"></div>
+                <div class="metric-sub" id="pill-rain-p90" style="font-size:0.7rem; color:#0288d1;"></div>
+              </div>
+              <div class="metric-pill temp">
+                <div class="metric-label">Temperature</div>
+                <div class="metric-val" id="pill-temp">-- °C</div>
+                <div class="metric-sub">Tmax / Tmin</div>
+              </div>
+              <div class="metric-pill wind">
+                <div class="metric-label">Wind Speed</div>
+                <div class="metric-val" id="pill-wind">-- km/h</div>
+                <div class="metric-sub">245° SW Monsoon</div>
+              </div>
+              <div class="metric-pill rh">
+                <div class="metric-label">Humidity</div>
+                <div class="metric-val" id="pill-rh">--%</div>
+                <div class="metric-sub">Max Canopy RH</div>
+              </div>
+            </div>
+
+            <!-- Crop & Stage Controls -->
+            <div style="display:flex; gap:10px; margin-bottom:14px;">
+              <select id="crop-select" onchange="generateCurrentAdvisory()" style="flex:1;">
+                <option value="wheat">Wheat (गेहूं)</option>
+                <option value="rice">Paddy / Rice (धान)</option>
+                <option value="cotton">Cotton (कपास)</option>
+                <option value="soybean">Soybean (सोयाबीन)</option>
+                <option value="onion">Onion (प्याज / कांदा)</option>
+                <option value="grapes">Grapes (द्राक्ष)</option>
+                <option value="sugarcane">Sugarcane (ऊस)</option>
+                <option value="maize">Maize (मक्का)</option>
+                <option value="tomato">Tomato (टमाटर)</option>
+                <option value="chickpea">Chickpea / Gram (चना)</option>
+              </select>
+
+              <select id="stage-select" onchange="generateCurrentAdvisory()" style="flex:1;">
+                <option value="crown_root">Crown Root Initiation (CRI)</option>
+                <option value="tillering">Tillering / Vegetative</option>
+                <option value="flowering_boll_setting">Flowering & Bloom</option>
+                <option value="pod_formation">Grain / Pod Filling</option>
+                <option value="maturity_harvest">Maturity / Harvest</option>
+              </select>
+            </div>
+
+            <!-- Action Box: Spray Window -->
+            <div class="advisory-box">
+              <div class="advisory-box-title">
+                <span>🧪 Chemical Spray Window</span>
+                <span id="spray-status-pill" class="status-pill status-go">GO</span>
+              </div>
+              <div class="advisory-box-text" id="spray-summary">Loading spray feasibility...</div>
+              <div style="font-size:0.78rem; color:#1976d2; margin-top:4px;" id="spray-window-time"></div>
+            </div>
+
+            <!-- Action Box: Irrigation Guidance -->
+            <div class="advisory-box">
+              <div class="advisory-box-title">
+                <span>💧 Irrigation Scheduling</span>
+                <span id="irrig-status-pill" class="status-pill status-caution">IRRIGATE</span>
+              </div>
+              <div class="advisory-box-text" id="irrig-guidance">Loading irrigation scheduling...</div>
+              <div style="font-size:0.78rem; color:#616161; margin-top:4px;" id="irrig-stats"></div>
+            </div>
+
+            <!-- Action Box: Pest & Disease Outbreak Risk -->
+            <div class="advisory-box">
+              <div class="advisory-box-title">
+                <span>🐛 Pest & Fungal Risk Warnings</span>
+              </div>
+              <div id="pest-alerts-list"></div>
+            </div>
+
+            <!-- Action Box: General Agronomic Guidelines -->
+            <div class="advisory-box">
+              <div class="advisory-box-title">
+                <span>📋 Field Actions & Fertilizer Timing</span>
+              </div>
+              <div id="agronomic-actions-list"></div>
+            </div>
+
+            <!-- Action Box: Krishi Mitr AI Copilot (Powered by Groq) -->
+            <div class="advisory-box highlight" style="background:#f3e5f5; border-color:#ce93d8;">
+              <div class="advisory-box-title">
+                <span>🤖 Krishi Mitr - AI Agromet Copilot</span>
+                <span class="badge-tag" style="background:#7b1fa2; color:white;">Groq LLM</span>
+              </div>
+              <div style="font-size:0.82rem; color:#4a148c; margin-bottom:8px;">
+                Ask real-time agro-met questions grounded in this village's downscaled data:
+              </div>
+              
+              <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
+                <button class="btn btn-outline" style="font-size:0.75rem; padding:3px 8px;" onclick="askQuickPrompt('Can I spray chemical pesticide tomorrow morning given this wind and rain forecast?')">Spray Safety?</button>
+                <button class="btn btn-outline" style="font-size:0.75rem; padding:3px 8px;" onclick="askQuickPrompt('Explain why this village has different rainfall than the block average.')">Rain Shadow?</button>
+                <button class="btn btn-outline" style="font-size:0.75rem; padding:3px 8px;" onclick="askQuickPrompt('What are organic alternatives for active disease risks in this crop?')">Organic Controls?</button>
+              </div>
+
+              <div style="display:flex; gap:6px;">
+                <input type="text" id="ai-query-input" placeholder="Type your query (Marathi, Hindi, English)..." style="flex:1; font-size:0.85rem; padding:6px 10px;">
+                <button class="btn btn-primary" id="ask-ai-btn" onclick="submitAIQuery()" style="padding:6px 14px; font-size:0.85rem;">
+                  <span>Ask AI</span>
+                </button>
+              </div>
+
+              <!-- AI Answer Box -->
+              <div id="ai-answer-container" style="display:none; margin-top:10px; background:white; border:1px solid #ba68c8; border-radius:6px; padding:10px; font-size:0.85rem; line-height:1.45;">
+                <div style="font-weight:700; color:#6a1b9a; margin-bottom:4px; display:flex; justify-content:space-between; align-items:center;">
+                  <span>💡 Krishi Mitr Advisory:</span>
+                  <button class="btn btn-outline" style="font-size:0.7rem; padding:2px 6px;" onclick="speakAIAnswer()">🔊 Read Aloud</button>
+                </div>
+                <div id="ai-answer-text" style="color:#212121; white-space:pre-wrap;"></div>
+              </div>
+            </div>
+
+            <!-- WhatsApp & SMS Broadcast Trigger -->
+            <div style="display:flex; gap:10px; margin-top:12px;">
+              <button class="btn btn-accent" id="open-broadcast-modal-btn" style="flex:1;">
+                <span>📢</span> Share via WhatsApp / SMS
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Full Panchayat Summary Table -->
+      <div class="card" style="margin-top:20px;">
+        <div class="card-header">
+          <div class="card-title">
+            <span>📑</span> Block Downscaled Summary Table (All Gram Panchayats)
+          </div>
+        </div>
+        <div class="card-body" style="overflow-x:auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Gram Panchayat</th>
+                <th>Elevation</th>
+                <th>Downscaled Rain</th>
+                <th>Tmax / Tmin</th>
+                <th>Wind Speed</th>
+                <th>Support Tier</th>
+              </tr>
+            </thead>
+            <tbody id="panchayat-table-body">
+              <tr><td colspan="6" style="text-align:center; color:#9e9e9e;">Loading panchayats...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: FARMER HYPERLOCAL PORTAL -->
+    <section id="farmer-view" class="view-panel">
+      <div class="control-strip">
+        <div class="control-group">
+          <label class="ctrl-label">Language / भाषा / ಭಾಷೆ:</label>
+          <select id="farmer-language-select" style="font-weight:700; color:var(--primary);">
+            <option value="mr">मराठी (Marathi)</option>
+            <option value="hi">हिंदी (Hindi)</option>
+            <option value="kn">ಕನ್ನಡ (Kannada)</option>
+            <option value="te">తెలుగు (Telugu)</option>
+            <option value="ta">தமிழ் (Tamil)</option>
+            <option value="en">English</option>
+          </select>
+
+          <label class="ctrl-label" style="margin-left:10px;">तालुका (Block):</label>
+          <select id="farmer-block-select" style="font-weight:600;"></select>
+
+          <label class="ctrl-label" style="margin-left:10px;">ग्रामपंचायत (Village):</label>
+          <select id="farmer-gp-select" style="font-weight:600; min-width:180px;"></select>
+        </div>
+      </div>
+
+      <div style="max-width:850px; margin: 0 auto;">
+        <!-- Audio Readout Card (Voice Synthesizer for Illiterate Farmers) -->
+        <div class="audio-player-card">
+          <div style="display:flex; align-items:center; gap:16px;">
+            <button class="play-circle-btn" id="play-voice-btn">🔊</button>
+            <div>
+              <div style="font-size:1.1rem; font-weight:700;">हवामान सल्ला ऐका (Listen to Weather Advisory)</div>
+              <div style="font-size:0.85rem; opacity:0.9;">Touch to listen in your local dialect (Marathi / Hindi / Kannada)</div>
+            </div>
+          </div>
+          <span class="badge-tag" style="background:rgba(255,255,255,0.25); color:white;">Text-to-Speech</span>
+        </div>
+
+        <!-- Voice Transcript Text Display -->
+        <div class="card" style="margin-top:16px; padding:16px; background:#fffde7; border-left:4px solid #fbc02d;">
+          <div style="font-size:0.8rem; font-weight:700; color:#f57f17; text-transform:uppercase;">Audio Narration Transcript:</div>
+          <div id="voice-transcript-text" style="font-size:0.95rem; line-height:1.5; color:#37474f; margin-top:4px;">
+            "गावपातळीवरील हवामान सल्ला ऐकण्यासाठी वरील बटण दाबा."
+          </div>
+        </div>
+
+        <!-- Action Grid for Farmers -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:20px;">
+          <!-- Spraying Card -->
+          <div class="card" style="padding:18px; border-top: 4px solid #2e7d32;">
+            <div style="font-size:1.05rem; font-weight:700; margin-bottom:8px;">🚿 आज फवारणी करावी का? (Can I Spray?)</div>
+            <p style="font-size:0.9rem; line-height:1.4; color:#424242;">
+              हवामानानुसार वाऱ्याचा वेग व पावसाचा अंदाज तपासूनच कीटकनाशक फवारणी करा. औषध वाहून जाणार नाही याची दक्षता घ्या.
+            </p>
+          </div>
+
+          <!-- Irrigation Card -->
+          <div class="card" style="padding:18px; border-top: 4px solid #0288d1;">
+            <div style="font-size:1.05rem; font-weight:700; margin-bottom:8px;">💧 पिकाला पाणी द्यावे का? (Irrigation?)</div>
+            <p style="font-size:0.9rem; line-height:1.4; color:#424242;">
+              जमिनीतील ओलावा आणि अपेक्षित पाऊस लक्षात घेऊन गरजेपुरतेच सिंचन करा. जास्त पाणी दिल्यास मुळांना इजा होऊ शकते.
+            </p>
+          </div>
+        </div>
+
+        <!-- Farmer AI Assistant Card -->
+        <div class="card" style="margin-top:20px; padding:20px; border-top: 4px solid #7b1fa2; background:linear-gradient(180deg, #faf5fb 0%, #ffffff 100%);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <div style="font-size:1.1rem; font-weight:700; color:#4a148c; display:flex; align-items:center; gap:8px;">
+              <span>🤖</span> कृषी मित्र AI सल्लागार (Krishi Mitr - Powered by Groq)
+            </div>
+            <span class="badge-tag" style="background:#7b1fa2; color:white;">Llama-3.3 70B / 120B</span>
+          </div>
+          <p style="font-size:0.88rem; color:#424242; margin-bottom:12px;">
+            तुमच्या पिकाबद्दल किंवा हवामानाबद्दल कोणताही प्रश्न मराठी, हिंदी किंवा इंग्रजीत विचारा:
+          </p>
+
+          <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;">
+            <button class="btn btn-outline" style="font-size:0.8rem;" onclick="askQuickFarmerPrompt('उद्या सकाळी कीटकनाशक फवारणी करावी का?')">🚿 फवारणी करावी का?</button>
+            <button class="btn btn-outline" style="font-size:0.8rem;" onclick="askQuickFarmerPrompt('माझ्या पिकाला आज किती पाणी द्यावे?')">💧 पाणी किती द्यावे?</button>
+            <button class="btn btn-outline" style="font-size:0.8rem;" onclick="askQuickFarmerPrompt('पावसामुळे खत वाहून जाण्याचा धोका आहे का?')">🌱 खतांचा डोस?</button>
+            <button class="btn btn-outline" style="font-size:0.8rem;" onclick="askQuickFarmerPrompt('रोग नियंत्रणासाठी जैविक उपाय काय आहेत?')">🌿 जैविक उपाय?</button>
+          </div>
+
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="farmer-ai-input" placeholder="तुमचा प्रश्न येथे विचारा (उदा: फवारणी कधी करावी?)..." style="flex:1; font-size:0.95rem; padding:10px 14px;">
+            <button class="btn btn-primary" onclick="submitFarmerAIQuery()" style="background:#7b1fa2;">
+              <span>विचार करा</span>
+            </button>
+          </div>
+
+          <div id="farmer-ai-answer-box" style="display:none; margin-top:14px; background:#fff; border:2px solid #ce93d8; border-radius:8px; padding:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <strong style="color:#4a148c;">कृषी मित्र उत्तर:</strong>
+              <button class="btn btn-outline" style="font-size:0.75rem; padding:3px 8px;" onclick="speakFarmerAIAnswer()">🔊 आवाज ऐका</button>
+            </div>
+            <div id="farmer-ai-answer-text" style="font-size:0.92rem; line-height:1.55; color:#212121; white-space:pre-wrap;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: AI SANDBOX & SCIENTIFIC BENCHMARK -->
+    <section id="sandbox-view" class="view-panel">
+      <div class="dashboard-grid">
+        <!-- Benchmark Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>📊</span> Downscaling Algorithm Benchmark (SIH 26074)
+            </div>
+            <button class="btn btn-primary" id="run-benchmark-btn">
+              <span>▶️</span> Run 5-Model Benchmark
+            </button>
+          </div>
+          <div class="card-body">
+            <p style="font-size:0.85rem; color:#616161; margin-bottom:14px;">
+              Compares accuracy, spatial error (MAE & RMSE in mm), and block mass conservation error across 5 paradigms.
+            </p>
+            <div style="margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+              <label class="ctrl-label">Test Rainfall (mm):</label>
+              <input type="number" id="bench-rain" value="15.0" step="1.0" style="width:80px;">
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Model / Paradigm</th>
+                  <th>MAE</th>
+                  <th>RMSE</th>
+                  <th>Conservation Error</th>
+                  <th>Accuracy Gain</th>
+                </tr>
+              </thead>
+              <tbody id="benchmark-table-body">
+                <tr><td colspan="5" style="text-align:center; color:#9e9e9e;">Click "Run 5-Model Benchmark" to compute results.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- PyTorch U-Net Super-Resolution Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <span>🧠</span> PyTorch Residual U-Net 2D Super-Resolution
+            </div>
+            <button class="btn btn-accent" id="run-unet-btn">
+              <span>⚡</span> Infer 0.05° Raster
+            </button>
+          </div>
+          <div class="card-body">
+            <p style="font-size:0.85rem; color:#616161; margin-bottom:14px;">
+              Runs continuous spatial field super-resolution from 0.25° coarse grid down to 0.05° (~5 km) resolution.
+            </p>
+            <div style="margin-bottom:14px; display:flex; align-items:center; gap:8px;">
+              <label class="ctrl-label">Base Grid Rain (mm):</label>
+              <input type="number" id="unet-rain" value="18.0" step="1.0" style="width:80px;">
+            </div>
+
+            <div class="metrics-pill-grid">
+              <div class="metric-pill rain">
+                <div class="metric-label">Min Field</div>
+                <div class="metric-val" id="unet-min">-- mm</div>
+              </div>
+              <div class="metric-pill temp">
+                <div class="metric-label">Mean Field</div>
+                <div class="metric-val" id="unet-mean">-- mm</div>
+              </div>
+              <div class="metric-pill wind">
+                <div class="metric-label">Max Field</div>
+                <div class="metric-val" id="unet-max">-- mm</div>
+              </div>
+              <div class="metric-pill rh">
+                <div class="metric-label">Std Dev</div>
+                <div class="metric-val" id="unet-std">-- mm</div>
+              </div>
+            </div>
+
+            <div style="background:#e8eaf6; padding:12px; border-radius:8px; font-size:0.82rem; color:#283593;">
+              <strong>Deep Architecture:</strong> 2-level residual U-Net (~120k parameters) conditioned on IMD coarse rainfall, SRTM DEM, ERA5 daily 2m temperature, max temperature, and dewpoint.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: LIVE NWP INGESTION -->
+    <section id="live-view" class="view-panel">
+      <div class="card" style="max-width:900px; margin: 0 auto;">
+        <div class="card-header">
+          <div class="card-title">
+            <span>📡</span> Live NWP & IMD Bulletin Connector
+          </div>
+        </div>
+        <div class="card-body">
+          <p style="font-size:0.9rem; color:#424242; margin-bottom:16px;">
+            Connect live numerical weather prediction forecasts via Open-Meteo / ECMWF IFS / IMD GKMS feeds to simulate operational panchayat downscaling.
+          </p>
+
+          <div style="display:flex; gap:12px; margin-bottom:16px;">
+            <button class="btn btn-primary" onclick="fetchLiveForecast()">
+              <span>🌐</span> Fetch Live ECMWF for Maharashtra
+            </button>
+            <button class="btn btn-outline" onclick="loadSampleIMDBulletin()">
+              <span>📄</span> Load Sample IMD 5-Day Bulletin
+            </button>
+          </div>
+
+          <pre id="live-json-preview" style="background:#263238; color:#eceff1; padding:14px; border-radius:8px; font-size:0.82rem; max-height:350px; overflow-y:auto;"></pre>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- WhatsApp & SMS Broadcast Modal -->
+  <div class="modal-overlay" id="broadcast-modal">
+    <div class="modal-box">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h3 style="font-size:1.1rem; color:var(--primary-dark);">📢 Multilingual Broadcast Generator</h3>
+        <button onclick="closeBroadcastModal()" style="border:none; background:none; font-size:1.2rem; cursor:pointer;">&times;</button>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <label class="ctrl-label">WhatsApp Agri-Bulletin:</label>
+        <pre id="whatsapp-preview-box" style="background:#f1f8e9; border:1px solid #c8e6c9; padding:12px; border-radius:6px; font-size:0.8rem; white-space:pre-wrap; max-height:220px; overflow-y:auto; margin-top:6px;"></pre>
+        <button class="btn btn-accent" onclick="copyWhatsAppText()" style="margin-top:8px;">
+          <span>📋</span> Copy WhatsApp Text
+        </button>
+      </div>
+
+      <div>
+        <label class="ctrl-label">160-Character SMS Alert:</label>
+        <pre id="sms-preview-box" style="background:#fff3e0; border:1px solid #ffe0b2; padding:10px; border-radius:6px; font-size:0.82rem; white-space:pre-wrap; margin-top:6px;"></pre>
+        <button class="btn btn-primary" onclick="copySMSText()" style="margin-top:8px;">
+          <span>📱</span> Copy SMS Alert
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Box -->
+  <div class="toast-msg" id="toast"></div>
+
+  <!-- Scripts -->
+  <script src="/static/js/map.js"></script>
+  <script src="/static/js/app.js"></script>
+  <script>
+    async function fetchLiveForecast() {
+      showToast("Fetching live ECMWF forecast from Open-Meteo...");
+      try {
+        const res = await fetch("/api/v1/ingestion/live-block?lat=18.2189&lon=74.4580&days=5");
+        const json = await res.json();
+        document.getElementById("live-json-preview").textContent = JSON.stringify(json, null, 2);
+        showToast("Live forecast retrieved successfully!");
+      } catch (err) {
+        showToast("Error: " + err.message);
+      }
+    }
+
+    async function loadSampleIMDBulletin() {
+      showToast("Loading official IMD sample bulletin...");
+      try {
+        const res = await fetch("/api/v1/samples/imd-bulletin");
+        const json = await res.json();
+        document.getElementById("live-json-preview").textContent = JSON.stringify(json, null, 2);
+        showToast("Sample bulletin loaded!");
+      } catch (err) {
+        showToast("Error: " + err.message);
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+{
+  "bulletin_id": "IMD-GKMS-2026-MH-089",
+  "issued_at": "2026-09-30T01:35:28.716921",
+  "source": "India Meteorological Department (IMD) - Agromet Advisory Service",
+  "state": "Maharashtra",
+  "district": "Pune",
+  "block_id": "IND.20.26.1_1",
+  "block_name": "Baramati",
+  "forecast_horizon_days": 5,
+  "daily_forecasts": [
+    {
+      "date": "2026-09-30",
+      "rainfall_mm": 12.5,
+      "rainfall_probability_pct": 75,
+      "tmax_c": 31.4,
+      "tmin_c": 21.2,
+      "rh_max_pct": 88,
+      "rh_min_pct": 62,
+      "wind_speed_kmh": 14.5,
+      "wind_direction_deg": 245,
+      "cloud_cover_octas": 6
+    },
+    {
+      "date": "2026-10-01",
+      "rainfall_mm": 28.0,
+      "rainfall_probability_pct": 85,
+      "tmax_c": 29.0,
+      "tmin_c": 20.5,
+      "rh_max_pct": 92,
+      "rh_min_pct": 74,
+      "wind_speed_kmh": 18.2,
+      "wind_direction_deg": 240,
+      "cloud_cover_octas": 7
+    },
+    {
+      "date": "2026-10-02",
+      "rainfall_mm": 8.0,
+      "rainfall_probability_pct": 60,
+      "tmax_c": 30.5,
+      "tmin_c": 21.0,
+      "rh_max_pct": 82,
+      "rh_min_pct": 58,
+      "wind_speed_kmh": 12.0,
+      "wind_direction_deg": 250,
+      "cloud_cover_octas": 5
+    },
+    {
+      "date": "2026-10-03",
+      "rainfall_mm": 1.5,
+      "rainfall_probability_pct": 25,
+      "tmax_c": 33.0,
+      "tmin_c": 21.8,
+      "rh_max_pct": 74,
+      "rh_min_pct": 48,
+      "wind_speed_kmh": 9.5,
+      "wind_direction_deg": 260,
+      "cloud_cover_octas": 3
+    },
+    {
+      "date": "2026-10-04",
+      "rainfall_mm": 0.0,
+      "rainfall_probability_pct": 10,
+      "tmax_c": 34.2,
+      "tmin_c": 22.0,
+      "rh_max_pct": 68,
+      "rh_min_pct": 42,
+      "wind_speed_kmh": 8.0,
+      "wind_direction_deg": 270,
+      "cloud_cover_octas": 2
+    }
+  ]
+}
