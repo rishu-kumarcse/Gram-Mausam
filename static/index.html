@@ -50,34 +50,34 @@
       <div class="control-strip">
         <div class="control-group block-select-group">
           <label class="ctrl-label">Administrative Block:</label>
-          <select id="officer-block-select" class="ctrl-select"></select>
+          <select id="officer-block-select" class="ctrl-select" onchange="handleBlockSelectChange(this.value)"></select>
           <span id="officer-weather-source-badge" class="badge-tag" style="background:#2e7d32; display:none;">🟢 Live NWP Feed</span>
         </div>
 
         <div class="control-group synoptic-inputs-group">
           <div class="synoptic-input-item">
             <label class="ctrl-label">Rain (mm):</label>
-            <input type="number" id="input-rain" value="14.5" step="0.5">
+            <input type="number" id="input-rain" value="14.5" step="any">
           </div>
 
           <div class="synoptic-input-item">
             <label class="ctrl-label">Tmax (°C):</label>
-            <input type="number" id="input-tmax" value="31.4" step="0.5">
+            <input type="number" id="input-tmax" value="31.4" step="any">
           </div>
 
           <div class="synoptic-input-item">
             <label class="ctrl-label">Tmin (°C):</label>
-            <input type="number" id="input-tmin" value="21.2" step="0.5">
+            <input type="number" id="input-tmin" value="21.2" step="any">
           </div>
 
           <div class="synoptic-input-item">
             <label class="ctrl-label">Wind (km/h):</label>
-            <input type="number" id="input-wind" value="14.5" step="0.5">
+            <input type="number" id="input-wind" value="14.5" step="any">
           </div>
 
           <div class="synoptic-input-item">
             <label class="ctrl-label">RH (%):</label>
-            <input type="number" id="input-rh" value="88.0" step="1.0">
+            <input type="number" id="input-rh" value="88.0" step="any">
           </div>
 
           <button class="btn btn-outline" id="btn-fetch-live-weather" onclick="fetchLiveWeatherForCurrentBlock()" title="Fetch live ECMWF forecast for this block" style="font-size:0.85rem;">
@@ -308,7 +308,7 @@
 
         <div class="farmer-ctrl-item">
           <label class="ctrl-label">तालुका (Block):</label>
-          <select id="farmer-block-select" style="font-weight:600;"></select>
+          <select id="farmer-block-select" style="font-weight:600;" onchange="handleBlockSelectChange(this.value)"></select>
         </div>
 
         <div class="farmer-ctrl-item">
@@ -537,8 +537,8 @@
   <div class="toast-msg" id="toast"></div>
 
   <!-- Scripts -->
-  <script src="/static/js/map.js"></script>
-  <script src="/static/js/app.js"></script>
+  <script src="/static/js/map.js?v=3.1.0"></script>
+  <script src="/static/js/app.js?v=3.1.0"></script>
   <script>
     async function fetchLiveForecast() {
       showToast("Fetching live ECMWF forecast from Open-Meteo...");

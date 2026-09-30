@@ -72,23 +72,29 @@ async function loadDistrictsAndBlocks() {
     fetchLiveWeatherForCurrentBlock(true);
 
     blockSelect.addEventListener("change", (e) => {
-      currentBlockId = e.target.value;
-      if (farmerBlockSelect) farmerBlockSelect.value = currentBlockId;
-      fetchLiveWeatherForCurrentBlock(true);
+      handleBlockSelectChange(e.target.value);
     });
 
     if (farmerBlockSelect) {
       farmerBlockSelect.value = currentBlockId;
       farmerBlockSelect.addEventListener("change", (e) => {
-        currentBlockId = e.target.value;
-        blockSelect.value = currentBlockId;
-        fetchLiveWeatherForCurrentBlock(true);
+        handleBlockSelectChange(e.target.value);
       });
     }
   } catch (err) {
     showToast("Error loading districts: " + err.message);
   }
 }
+
+window.handleBlockSelectChange = function(blockId) {
+  if (!blockId) return;
+  currentBlockId = blockId;
+  const offSelect = document.getElementById("officer-block-select");
+  const fSelect = document.getElementById("farmer-block-select");
+  if (offSelect && offSelect.value !== blockId) offSelect.value = blockId;
+  if (fSelect && fSelect.value !== blockId) fSelect.value = blockId;
+  fetchLiveWeatherForCurrentBlock(true);
+};
 
 async function fetchLiveWeatherForCurrentBlock(autoDownscale = true) {
   const badge = document.getElementById("officer-weather-source-badge");
@@ -99,7 +105,7 @@ async function fetchLiveWeatherForCurrentBlock(autoDownscale = true) {
   }
 
   try {
-    const res = await fetch(`/api/v1/geo/block-weather/${currentBlockId}`);
+    const res = await fetch(`/api/v1/geo/block-weather/${currentBlockId}?_t=${Date.now()}`);
     const json = await res.json();
     
     if (json.status === "success" && json.weather) {
@@ -116,6 +122,15 @@ async function fetchLiveWeatherForCurrentBlock(autoDownscale = true) {
       if (tminInput) tminInput.value = w.tmin_c !== undefined ? w.tmin_c : 21.0;
       if (windInput) windInput.value = w.wind_speed_kmh !== undefined ? w.wind_speed_kmh : 12.0;
       if (rhInput) rhInput.value = w.rh_max_pct !== undefined ? w.rh_max_pct : 80.0;
+
+      // Visual flash on inputs to indicate live update
+      [rainInput, tmaxInput, tminInput, windInput, rhInput].forEach(inp => {
+        if (inp) {
+          inp.style.transition = "background-color 0.3s";
+          inp.style.backgroundColor = "#e8f5e9";
+          setTimeout(() => { inp.style.backgroundColor = ""; }, 800);
+        }
+      });
 
       if (badge) {
         badge.style.display = "inline-block";
@@ -139,6 +154,8 @@ async function fetchLiveWeatherForCurrentBlock(autoDownscale = true) {
     await runBlockDownscaling();
   }
 }
+
+window.fetchLiveWeatherForCurrentBlock = fetchLiveWeatherForCurrentBlock;
 
 async function runBlockDownscaling() {
   showToast("Running Physics + ML Downscaling Engine...");
